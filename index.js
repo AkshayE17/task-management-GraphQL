@@ -21,11 +21,12 @@ app.use(cors({
 }));
 app.use(express.json()); 
  
-app.use('/graphql',auth,  graphqlHTTP({
+app.use('/graphql',   graphqlHTTP({
   schema,
   rootValue: resolvers,
-  graphiql: true 
+  graphiql: true
 }));
+
 
 connectDB(); 
 

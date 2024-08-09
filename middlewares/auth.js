@@ -1,31 +1,22 @@
 
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-import User from '../models/users.js';
 
-dotenv.config();
+const auth = (roles = []) => {
+  return (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'Access denied' });
 
-const auth = async (req, res, next) => {
-  const token = req.header('Authorization');
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) return res.status(403).json({ message: 'Forbidden' });
+      req.user = user;
 
-  if (!token) {
-    return res.status(401).json({ error: 'Authorization header missing' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
-
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    req.user = user; 
-    next();
-  } catch (error) { 
-    console.error('Authentication error:', error);
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+      if (roles.length && !roles.includes(user.role)) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+      next();
+    });
+  };
 };
-     
+ 
 export default auth;
+ 
