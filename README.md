@@ -46,4 +46,4 @@ Copy code
 npm start
 Access GraphiQL
 
-Open http://localhost:5000/graphql in your browser.
+Open http://localhost:8080/graphql in your browser.
